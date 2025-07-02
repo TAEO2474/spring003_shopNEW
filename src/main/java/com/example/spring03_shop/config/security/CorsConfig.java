@@ -1,7 +1,6 @@
 package com.example.spring03_shop.config.security;
 
 import java.util.List;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -15,11 +14,21 @@ public class CorsConfig {
 	@Bean("customCorsSource")
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration config = new CorsConfiguration();
-		config.setAllowCredentials(true);
-		//config.setAllowedOrigins(List.of("http://localhost:3000","http://127.0.0.1:3001")); //프론트엔드 주소
-		config.setAllowedOrigins(List.of("*"));
-		config.setAllowedMethods(List.of("GET","POST","PUT","DELETE", "OPTIONS"));
-		config.setAllowedHeaders(List.of("*"));
+		
+		//클라이언트에서 쿠키/인증정보 포함 허용 (예: withCredentials: true 사용 시 필요)
+		config.setAllowCredentials(true); 
+	
+		config.setAllowedOrigins(List.of("http://localhost:3000","http://127.0.0.1:3001")); //프론트엔드 주소
+		
+		//origin 와일드카드 허용 (Spring 5.3+만 지원)
+		//config.addAllowedOriginPattern("*"); // 와일드카드 허용 
+
+
+		config.setAllowedMethods(List.of("GET","POST","PUT","DELETE", "OPTIONS")); //허용할 HTTP 메서드 지정
+		config.setAllowedHeaders(List.of("*")); //모든 요청 헤더 허용
+		
+		// ✅ 브라우저에서 읽을 수 있도록 노출할 헤더 추가
+        config.setExposedHeaders(List.of("Authorization", "Authorization-refresh"));
 		
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", config);  //모든 경로에 대해 적용		
@@ -27,7 +36,9 @@ public class CorsConfig {
 	}
 } //end class
 
+
 /////////////////////////////////////////////////////////////
+
 
 //@Configuration  //스프링 설정 클래스임을 나타냄
 //public class CorsConfig {
@@ -49,15 +60,8 @@ public class CorsConfig {
 //}
 
 
+
 //CorsConfig보다 CorsConfigurationSource를 @Bean으로 등록하는 쪽이 Spring Security 6에서 가장 깔끔하고 호환성 높은 방식이다
 /////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
 
 

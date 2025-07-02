@@ -10,12 +10,20 @@ import com.example.spring03_shop.members.dto.AuthInfo;
 import com.example.spring03_shop.members.dto.ChangePwdCommand;
 import com.example.spring03_shop.members.dto.MembersDTO;
 import com.example.spring03_shop.members.entity.MembersEntity;
+import com.example.spring03_shop.members.repository.MemberRefreshTokenRepository;
 import com.example.spring03_shop.members.repository.MembersRepository;
 
+import jakarta.transaction.Transactional;
+
+@Transactional
 @Service
 public class MembersServiceImpl implements MembersService {
 
     private final CorsConfig corsConfig;
+	
+	@Autowired
+	private MemberRefreshTokenRepository refreshTokenRepository;
+    
 	@Autowired
 	private MembersRepository membersRepository;
 
@@ -56,8 +64,17 @@ public class MembersServiceImpl implements MembersService {
 
 	@Override
 	public void deleteMemberProcess(String memberEmail) {
+		// 1. 관련 리프레시 토큰 삭제
+		refreshTokenRepository.deleteByMemberEmail(memberEmail);
+		// 2. 사용자 삭제 
 		membersRepository.deleteById(memberEmail);
+		
 
+	}
+
+	@Override
+	public Optional<MembersEntity> findByEmail(String memberEmail) {
+		return membersRepository.findById(memberEmail);
 	}
 
 }
